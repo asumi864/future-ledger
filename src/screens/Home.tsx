@@ -30,12 +30,14 @@ function tasks(db: DB, today: YM): Task[] {
   const m = monthNum(today)
   const close = db.closes.find(c => c.month === prev)
   const val = db.valuations.find(v => v.month === today)
+  const mins = db.minutes.find(x => x.month === today)
+  const verdict = (mins?.raw as { chair?: { verdict?: string } } | undefined)?.chair?.verdict
   const reviewed = db.routines[today]?.reviewed
   const exported = db.lastExport && ymOf(new Date(db.lastExport)) === today
   const d = (ts?: number) => (ts ? `${new Date(ts).getMonth() + 1}/${String(new Date(ts).getDate()).padStart(2, '0')} 済` : '')
   return [
     { key: 'close', title: `${ymLabel(prev)}の締め`, sub: close ? `自由枠 ${yen(actualFree(db, close))}` : '手取りとMEの支出合計を入力', due: `〜${m}/03`, done: !!close, doneAt: d(close?.closedAt), to: '/close' },
-    { key: 'val', title: '評価額を入れて委員会へ', sub: val ? `評価額 ${yen(val.value)}` : '楽天証券の評価額を入力', due: `〜${m}/05`, done: !!val, doneAt: d(val?.enteredAt), to: '/review' },
+    { key: 'val', title: '評価額を入れて委員会へ', sub: mins ? `結論：${verdict ?? '記録済み'}` : val ? '評価額は入力済み → 相談文をコピー' : '楽天証券の評価額を入力', due: `〜${m}/05`, done: !!mins, doneAt: d(mins?.savedAt), to: '/review' },
     { key: 'rev', title: 'ほしいものの見直し', sub: '購入の目安月と優先度', due: `〜${m}/07`, done: !!reviewed, doneAt: d(reviewed), to: '/wishes' },
     { key: 'exp', title: 'データを書き出す', sub: '個人のDriveへ保存', due: `〜${m}/07`, done: !!exported, doneAt: d(db.lastExport), to: '/data' },
   ]

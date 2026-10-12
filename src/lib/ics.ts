@@ -46,6 +46,12 @@ export function routineICS(today: YM = ymOf(new Date())): string {
   ])
 }
 
+/** planICS に入る予定の件数 */
+export function planEventCount(db: DB, plan: Plan): number {
+  return db.wishes.filter(w => !w.boughtMonth && plan.wishes[w.id]?.eta).length
+    + db.expenses.filter(e => e.kind === 'fixed' && e.month >= plan.today).length
+}
+
 /** ほしいものの購入目安月と、日程固定の支払い月 */
 export function planICS(db: DB, plan: Plan): string {
   const ev: string[] = []

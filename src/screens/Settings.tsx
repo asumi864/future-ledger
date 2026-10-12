@@ -37,6 +37,8 @@ export function Settings() {
           <AmountRow label="現金目標" icon="chart" cls="ic-k" value={s.cashGoal} onChange={n => set(x => { x.cashGoal = n })} />
           <AmountRow label="現金貯金のいまの額" icon="coin" cls="ic-k" value={s.cashNow} onChange={n => set(x => { x.cashNow = n })} note="ホームの進捗表示に使います" />
         </div>
+        <label class="lst" style="display:block"><div class="it"><span class="ic ic-k"><Icon n="chart" /></span><span style="flex:1">積立中の商品名<span class="t11" style="display:block">委員会の相談文に入ります（任意）</span></span>
+          <input value={s.fundName ?? ''} placeholder="例：全世界株式" onInput={e => set(x => { x.fundName = (e.target as HTMLInputElement).value })} style="width:150px;text-align:left;font:500 13px var(--jp)" /></div></label>
         <div class="fld"><span class="lb">自由枠の見込みの出し方</span>
           <Seg value={s.forecast} onChange={v => set(x => { x.forecast = v })} options={[{ v: 'avg', label: '直近3か月の平均' }, { v: 'min', label: '直近の最低額', sub: '慎重' }]} />
         </div>

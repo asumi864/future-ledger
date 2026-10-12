@@ -93,6 +93,8 @@ export interface Settings {
   /** 取り戻し中も「必要」に回す月額 */
   needDuringRecovery: number
   heavy: HeavyMonth[]
+  /** 積立中の商品名（相談文に入れる。任意） */
+  fundName?: string
 }
 
 export interface RoutineState {
@@ -101,8 +103,11 @@ export interface RoutineState {
 
 export interface Minutes {
   month: YM
+  /** 検証済みの委員会の回答（CouncilResult） */
   raw: unknown
   savedAt: number
+  quarterly?: boolean
+  /** 本人の決定 */
   decision?: string
 }
 

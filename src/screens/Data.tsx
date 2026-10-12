@@ -2,7 +2,7 @@ import { HomeBack, Icon, toast } from '../components/ui'
 import { getDB, replaceDB, update, useDB } from '../lib/store'
 import type { DB } from '../lib/types'
 import { simulate } from '../lib/engine'
-import { planICS, routineICS } from '../lib/ics'
+import { planEventCount, planICS, routineICS } from '../lib/ics'
 import { ymOf } from '../lib/ym'
 
 function download(name: string, text: string, type: string) {
@@ -20,6 +20,8 @@ function isDB(x: unknown): x is DB {
 
 export function Data() {
   const db = useDB()
+  const plan = simulate(db, ymOf(new Date()))
+  const planCount = planEventCount(db, plan)
   const last = db.lastExport ? new Date(db.lastExport) : null
   const days = last ? Math.floor((Date.now() - last.getTime()) / 86400000) : null
 
@@ -59,8 +61,11 @@ export function Data() {
         <button class="it" onClick={() => { download('future-ledger-routine.ics', routineICS(), 'text/calendar'); toast('書き出しました') }}>
           <span class="ic ic-b"><Icon n="cal" /></span><span style="flex:1">定期の予定<span class="t11" style="display:block">毎月1日の「今月やること」・四半期の全体会議</span></span><span class="v">.ics</span><Icon n="down" class="chev" />
         </button>
-        <button class="it" onClick={() => { download('future-ledger-plan.ics', planICS(db, simulate(db, ymOf(new Date()))), 'text/calendar'); toast('書き出しました') }}>
-          <span class="ic ic-w"><Icon n="cal" /></span><span style="flex:1">ほしいもの・日程固定の予定月<span class="t11" style="display:block">計画が変わったら書き出し直してください</span></span><span class="v">.ics</span><Icon n="down" class="chev" />
+        <button class="it" onClick={() => {
+          if (!planCount) { toast('書き出す予定がありません。ほしいもの・日程固定の出費を登録してください'); return }
+          download('future-ledger-plan.ics', planICS(db, plan), 'text/calendar'); toast(`${planCount}件を書き出しました`)
+        }}>
+          <span class="ic ic-w"><Icon n="cal" /></span><span style="flex:1">ほしいもの・日程固定の予定月<span class="t11" style="display:block">{planCount ? `いま${planCount}件 · 計画が変わったら書き出し直してください` : 'まだ予定がありません（この端末のデータから作ります）'}</span></span><span class="v">{planCount}件</span><Icon n="down" class="chev" />
         </button>
       </div>
       <div class="note n-blue"><Icon n="info" /><span>予定のタイトルに金額は入りません。PCで個人のGoogleカレンダーを開き、設定 → インポートで取り込むと、Androidにも通知が届きます。</span></div>

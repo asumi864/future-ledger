@@ -7,6 +7,7 @@ import { getDB, update, useDB } from '../lib/store'
 import type { BigExpense, ExpenseKind, Income, Priority, Wish } from '../lib/types'
 import { addMonths, ymLabel, ymOf } from '../lib/ym'
 import { PARTS, partValue } from './Home'
+import { PasteSheet, PromptSheet, ValuationSheet } from './CouncilSheets'
 
 export function Sheets() {
   const { sheet, toastMsg } = useUI()
@@ -17,6 +18,9 @@ export function Sheets() {
       {sheet?.name === 'expense' && <ExpenseForm kind={(sheet.props?.kind as ExpenseKind) ?? 'spent'} />}
       {sheet?.name === 'income' && <IncomeForm />}
       {sheet?.name === 'month' && <MonthDetail month={sheet.props!.month as string} />}
+      {sheet?.name === 'valuation' && <ValuationSheet />}
+      {sheet?.name === 'paste' && <PasteSheet quarterly={!!sheet.props?.quarterly} />}
+      {sheet?.name === 'prompt' && <PromptSheet text={sheet.props!.text as string} />}
       {toastMsg && <div class="toast" role="status">{toastMsg}</div>}
     </>
   )

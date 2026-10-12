@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { emptyDB } from '../src/lib/defaults'
 import { simulate } from '../src/lib/engine'
-import { planICS, routineICS } from '../src/lib/ics'
+import { planEventCount, planICS, routineICS } from '../src/lib/ics'
 
 describe('カレンダー用ファイル', () => {
   it('毎月1日と四半期の繰り返し予定を作る', () => {
@@ -20,5 +20,10 @@ describe('カレンダー用ファイル', () => {
     expect(s).toContain('予約帳：ほしいもの見直し（本棚）')
     expect(s).toContain('DTSTART;VALUE=DATE:20270201')
     expect(s).not.toMatch(/15,?000|60,?000|¥/)
+  })
+
+  it('予定が無いときは0件と数える', () => {
+    const db = emptyDB('2026-10')
+    expect(planEventCount(db, simulate(db, '2026-10'))).toBe(0)
   })
 })
