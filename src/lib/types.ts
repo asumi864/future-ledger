@@ -66,6 +66,8 @@ export interface Valuation {
   /** 累計買付額 */
   invested: number
   enteredAt: number
+  /** まだ初回の買付が成立していない月（評価額なし） */
+  noPurchase?: boolean
 }
 
 export interface HeavyMonth {

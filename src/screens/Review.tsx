@@ -14,7 +14,8 @@ export function Review() {
   const today = ymOf(new Date())
   const plan = useMemo(() => simulate(db, today), [db, today])
   const [quarterly, setQuarterly] = useState(QUARTER.includes(monthNum(today)))
-  const vals = [...db.valuations].sort((a, b) => a.month.localeCompare(b.month))
+  const vals = [...db.valuations].filter(v => !v.noPurchase).sort((a, b) => a.month.localeCompare(b.month))
+  const pre = db.valuations.find(v => v.month === today && v.noPurchase)
   const cur = vals.find(v => v.month === today)
   const mins = db.minutes.find(m => m.month === today)
   const result = mins?.raw as CouncilResult | undefined
@@ -40,6 +41,7 @@ export function Review() {
         <div class="hdr">
           <div><HomeBack /><div class="ov" style="margin-top:12px">Review · {db.settings.fundName || 'NISA'}</div><h1>{ymLabel(today)}の振り返り</h1></div>
           {cur && <span class="pill p-ok"><Icon n="check" style="width:12px;height:12px;stroke-width:2.4" />評価額 入力済み</span>}
+          {pre && <span class="pill p-mute">まだ買付前</span>}
         </div>
 
         <button class="card" style="text-align:left" onClick={() => openSheet('valuation')}>
@@ -64,13 +66,17 @@ export function Review() {
               ) : <div class="t11" style="margin-top:10px">2か月分たまると推移のグラフが出ます</div>}
               <div class="mkey" style="margin-top:6px"><span><i style="background:var(--blue)" />評価額</span><span><i style="background:var(--faint)" />累計買付 {yen(cur.invested)}（入れたお金）</span></div>
             </>
+          ) : pre ? (
+            <div class="row"><div><div class="t13 b">{ymLabel(today)}はまだ買付前</div><div class="t11">初回の買付が成立したら、来月から評価額を入力します。タップで変更できます</div></div><Icon n="chev" class="chev" /></div>
           ) : (
-            <div class="row"><div><div class="t13 b">{ymLabel(today)}の評価額を入力</div><div class="t11">楽天証券の「保有商品」の評価額と、累計の買付額</div></div><Icon n="chev" class="chev" /></div>
+            <div class="row"><div><div class="t13 b">{ymLabel(today)}の評価額を入力</div><div class="t11">iGrow「資産」→「保有商品」の時価評価額と、累計の買付額。まだ買付前ならその旨を選べます</div></div><Icon n="chev" class="chev" /></div>
           )}
         </button>
 
         {result ? (
           <ChairCard r={result} onOpen={() => go(`/minutes?m=${today}`)} />
+        ) : pre ? (
+          <div class="note n-blue"><Icon n="info" /><span>今月は買付前なので、委員会への相談は不要です。家計や取り戻しについて相談したいときは、下のボタンから相談文をコピーできます。</span></div>
         ) : (
           <div class="card">
             <div class="ov" style="margin-bottom:6px">Council · 委員会に相談する</div>

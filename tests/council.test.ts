@@ -46,3 +46,13 @@ describe('回答の読み取り', () => {
     expect(parseCouncil(JSON.stringify({ ...sample, chair: { ...sample.chair, verdict: '全部売る' } })).chair.verdict).toBe('情報不足')
   })
 })
+
+describe('まだ買付前の月', () => {
+  it('相談文の推移に「買付前」の月を入れない', () => {
+    const db = emptyDB('2026-10')
+    db.valuations.push({ month: '2026-10', value: 0, invested: 0, enteredAt: 0, noPurchase: true })
+    const p = buildPrompt(db, simulate(db, '2026-10'), '2026-10', false)
+    expect(p).toContain('評価額：未入力')
+    expect(p).toContain('- 記録なし')
+  })
+})

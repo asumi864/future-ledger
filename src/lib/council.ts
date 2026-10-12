@@ -37,7 +37,7 @@ export const VERDICTS: Verdict[] = ['現状維持', '積立額の見直し', '�
 
 export function buildPrompt(db: DB, plan: Plan, month: YM, quarterly: boolean): string {
   const s = db.settings
-  const vals = db.valuations.filter(v => v.month <= month).sort((a, b) => a.month.localeCompare(b.month))
+  const vals = db.valuations.filter(v => v.month <= month && !v.noPurchase).sort((a, b) => a.month.localeCompare(b.month))
   const cur = vals.find(v => v.month === month)
   const hist = vals.slice(-4).map(v => `- ${v.month}：評価額 ${yen(v.value)} / 累計買付 ${yen(v.invested)}`).join('\n') || '- 記録なし'
   const row = plan.rows.find(r => r.month === month)
