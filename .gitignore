@@ -1,0 +1,6 @@
+node_modules
+dist
+*.local
+# 家計データのバックアップは絶対にコミットしない
+*.json.bak
+future-ledger-backup-*.json
